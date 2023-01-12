@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD=Jatin##123
+      - POSTGRES_USER=postgres_test
+      - POSTGRES_DB=test_erp
+  web:
+    build: .
+      # context: app
+      # dockerfie: Dockerfile
+    command: bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn app.main:app --host 0.0.0.0'
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    environment:
+      # - POSTGRES_PASSWORD=Jatin##123
+      # - POSTGRES_USER=postgres_test
+      # - POSTGRES_DB=test_erp
+      # - POSTGRES_HOSTNAME=localhost
+      - DATABASE_URL=postgresql://postgres_test:Jatin##123@db:5432/test_erp
+      # - DATABASE_PORT=5432
+      - CLIENT_ORIGIN=http://localhost:8000
+    depends_on:
+      - db
+volumes:
+  postgres_data:
